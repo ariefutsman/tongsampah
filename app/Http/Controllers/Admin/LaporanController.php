@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\TransaksiSetor;
 use App\Models\TransaksiTarik;
+use App\Support\Sql;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
@@ -39,7 +40,7 @@ class LaporanController extends Controller
 
         $rows = $this->filteredSetoranQuery($request)
             ->reorder()
-            ->selectRaw("DATE_FORMAT(tanggal, '{$format}') as periode, SUM(berat_kg) as total_berat, SUM(total_nilai) as total_nilai, COUNT(*) as jumlah_transaksi")
+            ->selectRaw(Sql::dateFormat('tanggal', $format)." as periode, SUM(berat_kg) as total_berat, SUM(total_nilai) as total_nilai, COUNT(*) as jumlah_transaksi")
             ->groupBy('periode')
             ->orderBy('periode')
             ->paginate(15)
@@ -104,7 +105,7 @@ class LaporanController extends Controller
 
         $rows = $this->filteredTarikQuery($request)
             ->reorder()
-            ->selectRaw("DATE_FORMAT(tanggal, '{$format}') as periode, SUM(jumlah) as total_jumlah, COUNT(*) as jumlah_transaksi")
+            ->selectRaw(Sql::dateFormat('tanggal', $format)." as periode, SUM(jumlah) as total_jumlah, COUNT(*) as jumlah_transaksi")
             ->groupBy('periode')
             ->orderBy('periode')
             ->paginate(15)

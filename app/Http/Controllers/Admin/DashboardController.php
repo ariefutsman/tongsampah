@@ -7,6 +7,7 @@ use App\Models\KategoriSampah;
 use App\Models\Nasabah;
 use App\Models\TransaksiSetor;
 use App\Models\TransaksiTarik;
+use App\Support\Sql;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -29,13 +30,13 @@ class DashboardController extends Controller
         $months = collect(range(0, 7))->map(fn ($i) => now()->subMonths(7 - $i)->startOfMonth());
 
         $setorPerBulan = TransaksiSetor::query()
-            ->selectRaw("DATE_FORMAT(tanggal, '%Y-%m') as bulan, SUM(total_nilai) as total")
+            ->selectRaw(Sql::dateFormat('tanggal', '%Y-%m')." as bulan, SUM(total_nilai) as total")
             ->where('tanggal', '>=', $months->first())
             ->groupBy('bulan')
             ->pluck('total', 'bulan');
 
         $tarikPerBulan = TransaksiTarik::query()
-            ->selectRaw("DATE_FORMAT(tanggal, '%Y-%m') as bulan, SUM(jumlah) as total")
+            ->selectRaw(Sql::dateFormat('tanggal', '%Y-%m')." as bulan, SUM(jumlah) as total")
             ->where('status', 'disetujui')
             ->where('tanggal', '>=', $months->first())
             ->groupBy('bulan')
